@@ -26,27 +26,22 @@ export async function getProducts(req, res) {
     let query = 'SELECT * FROM products'
     let params = []
 
-    const { genre } = req.query
+    const { genre, search } = req.query
 
     if (genre) {
+
       query += ' WHERE genre = ?'
       params.push(genre)
+
+    } else if (search) {
+
+      query += ' WHERE title LIKE ? OR artist LIKE ? OR genre LIKE ?'
+      const searchPattern = `%${search}%`
+      params.push(searchPattern, searchPattern, searchPattern)
+
     }
 
     const products = await db.all(query, params)
-    /*
-    Challenge:
-    1. Detect if a query string ‘genre’ is used. 
-       If it is, retrieve only products with that genre from the database and serve them. 
-       If not, all products should be served.
-    
-    hint.md for help
-    
-    Example incoming query: '?genre=rock'
-    */
-
-
-
 
     res.json(products)
 
